@@ -10,7 +10,6 @@ import {
 import { formatCurrency } from './utils';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: {
-  
   rejectUnauthorized: false
 } });
 
@@ -95,7 +94,8 @@ export async function fetchFilteredInvoices(
   query: string,
   currentPage: number,
 ) {
-  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+  const safePage =Number.isFinite(currentPage) && currentPage > 0 ? currentPage : 1;
+  const offset = (safePage - 1) * ITEMS_PER_PAGE;
 
   try {
     const invoices = await sql<InvoicesTable[]>`
